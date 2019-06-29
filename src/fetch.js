@@ -1,4 +1,3 @@
-import cookie from 'cookie';
 /**
  * Todo List
  *  cookie module dependency problem -> default cookie api
@@ -12,7 +11,7 @@ const HOST = isProduction ? '<mysite>' : 'localhost:8000';
 const BASE_URL = PROTOCOL + '://' + HOST;
 
 function fetch_extend(method, url, option, nocookie=true) {
-  let cookies = cookie.parse(document.cookie);
+  let cookies = parseCookies()
 
   return fetch(BASE_URL + url, Object.assign({
     method: method,
@@ -24,7 +23,8 @@ function fetch_extend(method, url, option, nocookie=true) {
 }
 
 function fetch_timeout(method, url, option, nocookie=true,timeout=10000) {
-  let cookies = cookie.parse(document.cookie);
+  let cookies = parseCookies()
+
   return Promise.race([
     fetch(BASE_URL + url, Object.assign({
       method: method,
@@ -37,7 +37,7 @@ function fetch_timeout(method, url, option, nocookie=true,timeout=10000) {
 }
 
 function fetch_post(url,body,timeout=15000) {
-  let cookies = cookie.parse(document.cookie);
+  let cookies = parseCookies()
   let formData = makeBody(body)
 
   return Promise.race([
@@ -74,9 +74,26 @@ function makeBody(body) {
     return formData
 }
 
+function test() {
+  return parseCookies()
+}
+
+function parseCookies() {
+  var work = document.cookie.split(";")
+  var cookies = {}
+
+  for(var idx in work) {
+    work[idx] = work[idx].trim()
+    var line = work[idx].split("=")
+    cookies[line[0]] = line[1]
+  }
+  return cookies
+}
+
 export default {
   POST: (url, option) => {return fetch_timeout('POST', url, option)},
   ex_post: (url, body) => {return fetch_post(url,body)},
   GET: (url, option, nocokie) => {return fetch_extend('GET', url, option, nocokie)},
-  fetch: fetch_extend
+  fetch: fetch_extend,
+  test: test
 }
