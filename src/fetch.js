@@ -1,6 +1,8 @@
 /**
  * Todo List
- *  cookie module dependency problem -> default cookie api
+ *  file send,receive
+ *  dev server communication
+ *  return result for json
  * 
  * cookie use -> option
  */
@@ -10,24 +12,27 @@ const PROTOCOL = isProduction ? 'https' : 'http';
 const HOST = isProduction ? '<mysite>' : 'localhost:8000';
 const BASE_URL = PROTOCOL + '://' + HOST;
 
-function fetch_extend(method, url, option, nocookie=true) {
+function fetch_extend(method, url, option, nocookie) {
   let cookies = parseCookies()
 
   return fetch(BASE_URL + url, Object.assign({
     method: method,
+    //cors options
+    mode: 'no-cors',
     credentials: !nocookie && 'include',
     headers: {
-      "X-CSRFToken": cookies["csrftoken"]
+      "X-CSRFToken": cookies["csrftoken"],
     }
   }, option));
 }
 
-function fetch_timeout(method, url, option, nocookie=true,timeout=10000) {
+function fetch_timeout(method, url, option, nocookie,timeout=10000) {
   let cookies = parseCookies()
 
   return Promise.race([
     fetch(BASE_URL + url, Object.assign({
       method: method,
+      mode: 'no-cors',
       credentials: !nocookie && 'include',
       headers: {
         "X-CSRFToken": cookies["csrftoken"]
